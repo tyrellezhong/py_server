@@ -90,5 +90,3 @@ def get_submitter_p4() -> str:
     return str_users
 
 # print(get_submitter_p4())
-
-o

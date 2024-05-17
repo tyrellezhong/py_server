@@ -1,0 +1,375 @@
+ 
+configs:
+  - cfgName: 'dev'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+        LogLevel: 'TRACE' 
+
+        ApolloApsSvrUrl: 'tcp://apollodevdir.woa.com:9050'
+        
+        Namespace: 'dev'
+        SetName: 'all_in_one'
+        CodeVersion: cfr
+        
+        
+        TLogdUrl: ''
+        QLogUrl: ''
+        
+        
+        DiskRootPath: '/tmp/'
+        ZoneAreaId: 101
+        TraceSampleRatio: 1.0
+        # tconnd默认路由shardid，正式环境配置为0，测试环境配置1或2
+        TconndRoutingDefaultShardID: 1
+
+    # 进程配置，生成对应进程的xml文件
+    procs:
+      - procName: 'ACTIVITY'
+        config:
+          CsPkgMaxSize: 12000
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 318
+          TcaplusZoneID: 101
+          TcaplusSignature: '15878953345F9680'
+          TcaplusDirServer_1: 'tcp://set2.tcapdir.tcaplusdev.oa.com:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 318
+          TcaplusZoneID: 101
+          TcaplusSignature: '15878953345F9680'
+          TcaplusDirServer_1: 'tcp://set2.tcapdir.tcaplusdev.oa.com:9999'
+      - procName: 'ACCOUNTSVRD'
+        config:
+          UseGlobalIDCheck: false
+      - procName: 'PLATPROXY'
+        config:
+          gmsvr_url: "9.135.224.129:18800"
+      - procName: 'GPAWEBHOOK'
+        config:
+          DefaultReplicas: 1
+          GPAOFFServiceList: 'tconnd,room_match,lobby'
+      - procName: 'DSPING'
+        config:
+          DsPing:
+            VPort: 7001
+            HeartbeatIntervalSec: 4
+            Vips: [ { Vip : "180.102.96.121", Isp : 3}, { Vip : "112.86.240.125", Isp : 2},  { Vip : "36.155.205.239", Isp : 1} ]
+      - procName: 'GPASVR'
+        config:
+          ForceGPAList: ["gpasvr|1","gpawebhook|1","gpasvrds|1","gpawebhookds|1","tconnd|5","lobby|5"]
+      - procName: 'PAYPROXY'
+        config:
+          ForceMidas: false
+      - procName: 'TIMER'
+        config:
+          TcaplusAppID: 318
+          TcaplusZoneID: 101
+          TcaplusSignature: '15878953345F9680'
+          TcaplusDirServer_1: 'tcp://set2.tcapdir.tcaplusdev.oa.com:9999'
+  - cfgName: 'trunk'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+        DiskRootPath: '/data/home/user00/'
+        ZoneAreaId: 11
+        TconndTpNetType: 0
+        
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+        TconndRoutingDefaultShardID: 1
+        
+    procs:
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 202
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 202
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'DSA'
+        config:
+          DSOuterSegmentPortBegin: 7650
+          DSDomainName: 'tstv2.shgame.qq.com'
+          DSOuterIP_1: '109.244.216.66'
+          DSISPType_1: 4
+          DSOuterIP_2: '140.206.161.28'
+          DSISPType_2: 2
+          DSOuterIP_3: '183.194.204.80'
+          DSISPType_3: 3
+          DSOuterIP_4: '101.91.43.144'
+          DSISPType_4: 1
+      - procName: 'ACCOUNTSVRD'
+        config:
+          UseGlobalIDCheck: true
+  - cfgName: 'tiyan205'
+    # ds部署在bcs中
+    common:
+      config:
+        TLogdUrl: ''
+        QLogUrl: ''
+
+        DiskRootPath: '/data/home/user00/log/tiyan205'
+        ZoneAreaId: 11
+        TconndTpNetType: 0
+        
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+        TconndRoutingDefaultShardID: 1
+        
+    procs:
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 202
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 202
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'DSA'
+        config:
+          DSOuterSegmentPortBegin: 7500
+          DSDomainName: 'test2.cfr.qq.com'
+      - procName: 'ACCOUNTSVRD'
+        config:
+          UseGlobalIDCheck: true
+  - cfgName: 'ms_branch'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+
+        DiskRootPath: '/data/home/user00/log/ms_branch'
+        TconndTpNetType: 0
+        
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+        TconndRoutingDefaultShardID: 1
+        
+        ZoneAreaId: 13
+    procs:
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 211
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 211
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'DSA'
+        config:
+          MaxDSNum: 50
+          DSOuterSegmentPortBegin: 7500
+          DSDomainName: 'test3.cfr.qq.com'
+          DSOuterIP_1: '180.101.245.78'
+          DSISPType_1: 1
+          DSLogPath: '/data/ramfs/ds'  # DS日志路径
+          DSAILabPath: '/data/ramfs/ailab'  # AILab数据收集存放路径
+          DSDemosPath: '/data/ramfs/demos'
+          DSNetworkProfilerPath: '/data/ramfs/profiling' #NetworkProfiler保存路径
+      - procName: 'ACCOUNTSVRD'
+        config:
+          UseGlobalIDCheck: true
+  - cfgName: 'engin_dev'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+
+        TLogdUrl: ''
+        QLogUrl: ''
+        DiskRootPath: '/data/home/user00/'
+        TconndTpNetType: 0
+        
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+        TconndRoutingDefaultShardID: 1
+        
+    procs:
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 201
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 201
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'DSA'
+        config:
+          DSOuterSegmentPortBegin: 7500
+          DSDomainName: 'test2.cfr.qq.com'
+          DSOuterIP_1: '180.101.245.123'
+          DSISPType_1: 1
+      - procName: 'ACCOUNTSVRD'
+        config:
+          UseGlobalIDCheck: true
+  - cfgName: 'master_test'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+        LogLevel: 'INFO'
+        TconndLogLevel: 'INFO'
+        TLogdUrl: ''
+        QLogUrl: ''
+        DiskRootPath: '/data/home/user00/'
+        TconndTpNetType: 0 
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+        TconndRoutingDefaultShardID: 1 
+        ZoneAreaId: 14
+    procs:
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 209
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 209
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'DSA'
+        config:
+          DSOuterSegmentPortBegin: 7500
+          DSDomainName: 'test4.cfr.qq.com'
+          DSOuterIP_1: '180.101.246.43'
+          DSISPType_1: 1
+      - procName: 'ACCOUNTSVRD'
+        config:
+          UseGlobalIDCheck: true
+      - procName: 'PERF_AGENT'
+        config:
+          OpenFlameGraph: false
+  - cfgName: 'master_special_test'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+        ApolloBusinessID: 769770017
+        DiskRootPath: '/data/home/user00/'
+        TconndTpNetType: 0
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+        TconndRoutingDefaultShardID: 1
+        ZoneAreaId: 15
+    procs:
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 210
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 210
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'DSA'
+        config:
+          DSOuterSegmentPortBegin: 7500
+          DSDomainName: 'test5.cfr.qq.com'
+          DSOuterIP_1: '222.94.109.200'
+          DSISPType_1: 1
+      - procName: 'ACCOUNTSVRD'
+        config:
+          UseGlobalIDCheck: true
+      - procName: 'PAYPROXY'
+        config:
+          ForceMidas: false
+  - cfgName: 'pressure_test'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+        LogLevel: 'INFO'
+        TconndLogLevel: 'INFO'
+        TLogdUrl: ''
+        QLogUrl: ''
+        DiskRootPath: '/data/home/user00/'
+        ZoneAreaId: 16
+        TconndTpNetType: 0
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+        TconndRoutingDefaultShardID: 1
+        
+    procs:
+      - procName: ACCOUNTSVRD
+        config:
+          UseGlobalIDCheck: false
+          UseWhiteList: false
+      - procName: LOBBY
+        config:
+          MaxDisconnectTime: 2
+      - procName: 'ROOM'
+        config:
+          SelectHeroPreOpen: false
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 212
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set21.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 212
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set21.tcapdir.idc.tcaplus.db:9999'
+  - cfgName: 'tlog_env'
+    # 通用配置，tmpl文件中替换config中的变量内容
+    common:
+      config:
+        TconndLogLevel: 'INFO'
+        TLogdUrl: ''
+        QLogUrl: ''
+        DiskRootPath: '/data/home/user00/'
+        ZoneAreaId: 16
+        TconndTpNetType: 0
+        TconndTpDataProxyDomain: idc-proxy.gamesafe.qq.com
+        TconndTpBusiProxyDomain: ''
+        TconndTpTestDataProxyDomain: exp.idc-proxy.gamesafe.qq.com
+        TconndTpTestBusiProxyDomain: ''
+    procs:
+      - procName: 'DBSVRD'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 216
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'
+      - procName: 'GUILD_CACHE'
+        config:
+          TcaplusAppID: 127
+          TcaplusZoneID: 216
+          TcaplusSignature: '73B360C02A5420B5'
+          TcaplusDirServer_1: 'tcp://set18.tcapdir.idc.tcaplus.db:9999'

@@ -19,8 +19,8 @@ class MongoCtl:
     mongo_url_idc ="mongodb://admin:cfrwebsvr123@11.153.66.142:27017"
 
     def __init__(self) -> None:
-        self.dbname = "test" # db 名字
-        self.collection_name = "user" # 集合名字
+        self.dbname = "pack_material_change_db" # db 名字
+        self.collection_name = "log" # 集合名字
         self.collection_size = 100 * 1024 * 1024 # 固定集合大小
         try:
             # 尝试连接到MongoDB
@@ -36,12 +36,13 @@ class MongoCtl:
             exit
 
         self.db = self.client[self.dbname] # 数据库对象
-        self.set = self.db[self.collection_name] # 集合对象
 
         # 集合不存在，创建
         if self.collection_name not in self.db.list_collection_names():
             self.db.create_collection(self.collection_name, capped=True, size=self.collection_size)
             logger.info("collection_name:%s create", self.collection_name)
+
+        self.set = self.db[self.collection_name] # 集合对象
 
         logger.info("mongo-client connected")
 
@@ -84,7 +85,7 @@ class PackDocument:
         return map
 
     def get_file_path(self) -> str:
-        file_name = self.P4WorkspaceName + "_" + self.current_change_num + ".log"
+        file_name = self.P4WorkspaceName + "_" + self.package_version + ".log"
         return file_name
 
     def dump_to_json(self):
@@ -99,7 +100,6 @@ class PackDocument:
         if not os.path.exists(file_name):
             logger.error("%s not exist"%(file_name))
             exit
-
         with open(file_name, "r") as file:
             data = json.load(file)
             return data
@@ -111,16 +111,16 @@ class PackDocument:
         if not bool(self.current_change_num):
             self.current_change_num = os.popen("p4 changes -m1 -s submitted | awk '{print $2}'").read().rstrip() # 服务器所处最新change
         get_changes_sh = "p4 changes -tL -s submitted @{},@{}".format(self.last_change_num, self.current_change_num)
-        # get_changes_sh = "p4 changes -tL -s submitted @{},@{}".format(26865, 26866)
         self.pack_revision_info = os.popen(get_changes_sh).read()
         if dump_to_json:
             self.dump_to_json()
             # self.load_from_json()
-        logger.info(self.doc_info())
+        # logger.info(self.doc_info())
 
     def record_revison_info(self, mongo : MongoCtl, use_file : bool):
         if use_file:
             succ = mongo.set.insert_one(self.load_from_json())
+            os.remove(self.get_file_path())
         else:
             succ = mongo.set.insert_one(self.doc_info())
         if not succ:

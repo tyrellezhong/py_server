@@ -11,10 +11,11 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "xxx",
-                "-h 10",
-                "--help=5",
-                "list"
+                "taylorzhong_dev_linux",
+                "0.0.0.1",
+                "30190",
+                "30190",
+                "2024-06-21 10:06:52.128"
             ]
         }
     ]

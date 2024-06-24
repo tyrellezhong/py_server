@@ -21,7 +21,7 @@ class MongoCtl:
 
     def __init__(self) -> None:
         # pack_material_change_db
-        self.dbname = "test" # db 名字
+        self.dbname = "pack_material_change_db" # db 名字
         self.collection_name = "log" # 集合名字
         self.collection_size = 100 * 1024 * 1024 # 固定集合大小
         try:
@@ -74,6 +74,8 @@ class PackDocument:
         # {
         #   include_code : bool
         #   include_uasset : bool
+        #   include_common : bool
+        #   include_others : bool
         #   change_desc : str
         #   change_files : str
         # }

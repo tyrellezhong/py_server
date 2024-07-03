@@ -169,6 +169,7 @@ class PackDocument:
                     include_others = True
                 # 最多记录100行
                 if file_count >= 100:
+                    change_files += "... ... \n"
                     break
             else:
                 change_desc += line

@@ -142,13 +142,20 @@ class PackDocument:
 
         ignore_search = re.compile(r"//CFR/trunk/dev/Source/Source/CFRServerOnly/CFRProto/pb/")
 
+        ignore_record = {"client@"}
+        file_count = 0
 
         for line in change_descs:
+            for case in ignore_record:
+                if line.find(case) >= 0:
+                    return revision_info
+
             if not change_files_begin:
                 if line.find("Affected files", 0, len("Affected files")) > -1:
                     change_files_begin = True
             if  change_files_begin:
                 change_files += line
+                file_count += 1
 
                 if ignore_search.search(line):
                     continue
@@ -160,6 +167,9 @@ class PackDocument:
                     include_common = True
                 if others_search_1.search(line) or others_search_2.search(line) or others_search_3.search(line):
                     include_others = True
+                # 最多记录100行
+                if file_count >= 100:
+                    break
             else:
                 change_desc += line
 
@@ -181,23 +191,45 @@ class PackDocument:
         get_changes_sh = "p4 changes -s submitted @{},@{} | ".format(self.last_change_num, self.current_change_num) + r" awk '{print $2}'"
         all_changes = os.popen(get_changes_sh).readlines()
         for change in all_changes:
-            self.pack_revision_info.append(self.analy_one_change(int(change.strip())))
+            one_change = self.analy_one_change(int(change.strip()))
+            if len(one_change) > 0:
+                self.pack_revision_info.append(one_change)
 
         if dump_to_json:
             self.dump_to_json()
 
     def record_revison_info(self, mongo : MongoCtl, use_file : bool):
-        size_limit = 16 * 1024 * 1024
+        size_limit = 14 * 1024 * 1024
+        succ = False
         if use_file:
             source_dic = self.load_from_json()
             file_size = os.path.getsize(self.get_file_path())
             if file_size >= size_limit:
-                length = len(source_dic["pack_revision_info"])
+                pack_revision_info = source_dic["pack_revision_info"]
+                length = len(pack_revision_info)
+
+                # 分 record 存储
+                # source_dic["pack_revision_info"] = []
+                # record_time = file_size // size_limit if file_size % size_limit == 0 else file_size // size_limit + 1
+                # phase_len = length // record_time
+                # while phase_len * record_time < length:
+                #     phase_len += 1
+                # for i in range(0, record_time):
+                #     # cur_dic = copy.deepcopy(source_dic)
+                #     start_idx = i * phase_len
+                #     end_idx = min((i + 1) * phase_len, length)
+                #     source_dic["record_index"] = i + 1
+                #     source_dic["pack_revision_info"] = pack_revision_info[start_idx : end_idx]
+                #     succ = mongo.set.insert_one(source_dic)
+                #     del source_dic['_id']
+
+                # 直接省略文件修改详情
                 for i in range(0, length):
                     one_change = source_dic["pack_revision_info"][i]
                     one_change["change_files"] = "The data record is too large, omitting file modification details..."
-
-            succ = mongo.set.insert_one(source_dic)
+                succ = mongo.set.insert_one(source_dic) and succ
+            else:
+                succ = mongo.set.insert_one(source_dic)
             os.remove(self.get_file_path())
         else:
             succ = mongo.set.insert_one(self.doc_info())

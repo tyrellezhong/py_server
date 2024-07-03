@@ -21,9 +21,10 @@ class MongoCtl:
 
     def __init__(self) -> None:
         # pack_material_change_db
-        self.dbname = "pack_material_change_db" # db 名字
+        self.dbname = "test" # db 名字
         self.collection_name = "log" # 集合名字
-        self.collection_size = 100 * 1024 * 1024 # 固定集合大小
+        self.collection_size = 500 * 1024 * 1024 # 固定集合大小
+        self.max_record = 1000  # 最大历史记录条数
         try:
             # 尝试连接到MongoDB
             self.client = MongoClient(MongoCtl.mongo_url_dev) # mongodb 客户端
@@ -41,7 +42,7 @@ class MongoCtl:
 
         # 集合不存在，创建
         if self.collection_name not in self.db.list_collection_names():
-            self.db.create_collection(self.collection_name, capped=True, size=self.collection_size)
+            self.db.create_collection(self.collection_name, capped=True, size=self.collection_size, max = self.max_record)
             self.db[self.collection_name].create_index([("P4WorkspaceName", -1)])
             self.db[self.collection_name].create_index("package_version")
             logger.info("collection_name:%s create", self.collection_name)
@@ -131,12 +132,16 @@ class PackDocument:
         change_descs = os.popen(shell_cmd).readlines()
         change_files_begin = False
 
-        code_search = re.compile(r'//CFR/trunk/dev/Source/') # 代码
-        uassert_search = re.compile(r'//CFR/trunk/dev/Resource/') # 资源
+        code_search_1 = re.compile(r'//CFR/trunk/dev/Source/Source/') # 代码
+        code_search_2 = re.compile(r'//CFR/trunk/dev/Source/Plugins/') # 代码
+        uassert_search = re.compile(r'//CFR/trunk/dev/Resource/Content/') # 资源
         common_search = re.compile(r'//CFR/trunk/dev/Common/') # common (dsv)
         others_search_1 = re.compile(r'//CFR/trunk/dev/CI/')
         others_search_2 = re.compile(r'//CFR/trunk/dev/Editor/')
         others_search_3 = re.compile(r'//CFR/trunk/dev/Tool/')
+
+        ignore_search = re.compile(r"//CFR/trunk/dev/Source/Source/CFRServerOnly/CFRProto/pb/")
+
 
         for line in change_descs:
             if not change_files_begin:
@@ -144,7 +149,10 @@ class PackDocument:
                     change_files_begin = True
             if  change_files_begin:
                 change_files += line
-                if code_search.search(line):
+
+                if ignore_search.search(line):
+                    continue
+                if code_search_1.search(line) or code_search_2.search(line):
                     include_code = True
                 if uassert_search.search(line):
                     include_uasset = True
@@ -179,8 +187,17 @@ class PackDocument:
             self.dump_to_json()
 
     def record_revison_info(self, mongo : MongoCtl, use_file : bool):
+        size_limit = 16 * 1024 * 1024
         if use_file:
-            succ = mongo.set.insert_one(self.load_from_json())
+            source_dic = self.load_from_json()
+            file_size = os.path.getsize(self.get_file_path())
+            if file_size >= size_limit:
+                length = len(source_dic["pack_revision_info"])
+                for i in range(0, length):
+                    one_change = source_dic["pack_revision_info"][i]
+                    one_change["change_files"] = "The data record is too large, omitting file modification details..."
+
+            succ = mongo.set.insert_one(source_dic)
             os.remove(self.get_file_path())
         else:
             succ = mongo.set.insert_one(self.doc_info())

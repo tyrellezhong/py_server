@@ -227,7 +227,7 @@ class PackDocument:
                 for i in range(0, length):
                     one_change = source_dic["pack_revision_info"][i]
                     one_change["change_files"] = "The data record is too large, omitting file modification details..."
-                succ = mongo.set.insert_one(source_dic) and succ
+                succ = mongo.set.insert_one(source_dic)
             else:
                 succ = mongo.set.insert_one(source_dic)
             os.remove(self.get_file_path())
